@@ -4,22 +4,24 @@ FROM python:3.10-slim
 # Define o diretório de trabalho
 WORKDIR /app
 
-# Instala as ferramentas de sistema (C-bindings) exigidas pelo Google/ChromaDB
-RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
+# Instala ferramentas base do Linux exigidas pelo ChromaDB
+RUN apt-get update && apt-get install -y build-essential sqlite3 && rm -rf /var/lib/apt/lists/*
 
-# Copia os arquivos do projeto para dentro do container
+# Instala as bibliotecas Python
 COPY requirements.txt .
-
-# Atualiza o instalador e baixa as bibliotecas
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia o aplicativo e o banco vetorial
+# Copia a aplicação, a base limpa de CSV e o script construtor (NÃO o banco pesado)
 COPY app.py .
-COPY chroma_db_olist ./chroma_db_olist
+COPY base_conhecimento_limpa.csv .
+COPY build_db.py .
+
+# A MÁGICA: Constrói o banco vetorial dentro da nuvem para evitar erros de arquitetura!
+RUN python build_db.py
 
 # Expõe a porta padrão do Streamlit
 EXPOSE 8501
 
-# Comando atualizado: Desativa o vigia de arquivos e força o modo produção
+# Comando para iniciar o painel
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.fileWatcherType=none", "--server.headless=true"]
