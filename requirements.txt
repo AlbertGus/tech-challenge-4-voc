@@ -1,0 +1,11 @@
+pandas
+streamlit
+langchain
+langchain-google-genai
+langchain-huggingface
+langchain-community
+chromadb
+sentence-transformers
+python-dotenv
+tqdm
+google-generativeai

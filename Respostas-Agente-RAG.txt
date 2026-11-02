@@ -1,0 +1,50 @@
+Resposta 1:
+
+Com base na análise das avaliações dos clientes, os principais problemas relatados em relação à qualidade dos produtos concentram-se na insatisfação geral com o acabamento/material e na presença de avarias físicas:
+
+Péssima ou má qualidade geral do produto:
+
+Categoria Perfumaria: Os clientes apontam descontentamento direto com a qualidade do item.
+Evidência: Comentário "má qualidade do produto" [Nota: 3 | Categoria: perfumaria].
+Categoria Cama, Mesa e Banho: Há relatos recorrentes avaliados com nota mínima de qualidade insuficiente.
+Evidência: Comentário "Péssima qualidade do produto" [Nota: 1 | Categoria: cama_mesa_banho].
+Categoria Brinquedos: Queixa sobre a qualidade geral do item entregue.
+Evidência: Trecho " ... e péssima qualidade" constante no comentário "Produto com avarias e péssima qualidade" [Nota: 1 | Categoria: brinquedos].
+Produtos entregues com variações:
+
+Categoria Brinquedos: Além da baixa qualidade, foi relatado dano físico no produto.
+Evidência: Trecho "Produto com avarias..." no comentário "Produto com avarias e péssima qualidade" [Nota: 1 | Categoria: brinquedos].
+
+Resposta 2:
+
+Com base no contexto das avaliações demonstradas, os clientes estão elogiando os seguintes aspectos em relação ao atendimento ao cliente e ao prazo de entrega:
+
+Entrega Antecipada e Caprichosa:
+
+Os clientes destacam positivamente o cumprimento e a superação do prazo, ressaltando o cuidado e a qualidade na entrega dos produtos.
+Evidência: Trecho "[...] mercadorias entregues antes do prazo"(Categoria: cama_mesa_banho | Nota: 4 ).
+Evidência: Trecho "[...] Serviço excelente qualidade entrega capricho [...]"(Categoria: esporte_lazer | Nota: 5 ).
+Qualidade, Atenção e Responsabilidade no Atendimento:
+
+O atendimento ao cliente é elogiado por ser bom, gentil, cuidadoso e demonstrar responsabilidade com o consumidor, chegando a cativá-lo.
+Evidência: Trecho "Bom atendimento ao cliente [...]"(Categoria: cama_mesa_banho | Nota: 4 ).
+Evidência: Trecho "[...] atenção cuidado vou continuar comprando com a empresa parabéns por cativar os clientes [...]"(Categoria: esporte_lazer | Nota: 5 ).
+Evidência: Trecho "[...] responsabilidade dom o cliente...parabéns."(Categoria: construcao_ferramentas_iluminacao | Nota: 5 ).
+
+Resposta 3:
+
+Com base na análise das avaliações da categoria beleza_saude, os principais problemas relatados pelos clientes são:
+
+Envio de produto divergente e mau atendimento:
+
+Evidência: "Produto diferente do pedido. E ainda por cima vcs prestam um mal atendimento" [Nota: 1 | Categoria: beleza_saude]
+Dificuldades no rastreamento e acompanhamento da entrega:
+
+Evidência: "Difícil acompanhar a entrega. Rastreamento não entra" [Nota: 2 | Categoria: beleza_saude]
+Produto entregue com defeito e solicitação de troca/suporte:
+
+Evidência: "Favor responder a tesoura de desfiar veio com defeito preciso trocar" [Nota: 1 | Categoria: beleza_saude]a.
+
+Resposta 4:
+
+Não há evidências suficientes na base de avaliações para responder a esta pergunta.
