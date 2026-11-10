@@ -12,9 +12,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia a aplicação, a base limpa de CSV e o script construtor (NÃO o banco pesado)
+# Copia a aplicação, a base limpa de CSV e o script construtor
 COPY app.py .
-COPY base_conhecimento_limpa.csv .
+COPY dados/ ./dados/
 COPY build_db.py .
 
 # A MÁGICA: Constrói o banco vetorial dentro da nuvem para evitar erros de arquitetura!
