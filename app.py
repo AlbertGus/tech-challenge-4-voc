@@ -42,33 +42,6 @@ def formatar_docs_com_metadados(docs):
         contextos.append(f"[Nota: {nota} | Categoria: {categoria}] Comentário: {texto}")
     return "\n\n".join(contextos)
 
-def montar_pipeline(retriever):
-    llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0.1)
-    
-    template_voc = """
-    Você é um analista de Voice of Customer (VoC) de um e-commerce.
-    Seu objetivo é responder à pergunta do gestor utilizando estritamente o contexto de avaliações fornecido.
-
-    Regras de negócio:
-    1. Responda baseando-se APENAS no contexto abaixo.
-    2. Se o contexto não contiver informações suficientes, responda EXATAMENTE: "Não possuo evidências suficientes na base de avaliações para responder a esta pergunta."
-    3. Sempre cite as evidências: mencione trechos dos comentários e faça referência à Categoria e à Nota.
-    4. Estruture a resposta em tópicos.
-
-    Contexto (Avaliações recuperadas):
-    {context}
-
-    Pergunta do gestor: {question}
-
-    Resposta analítica:
-    """
-    return (
-        {"context": retriever | formatar_docs_com_metadados, "question": RunnablePassthrough()}
-        | PromptTemplate.from_template(template_voc)
-        | llm
-        | StrOutputParser()
-    )
-
 # 3. Interface de Interação (Com Filtro Visual)
 col1, col2 = st.columns([2, 1])
 
@@ -83,22 +56,50 @@ with col2:
         "utilidades_domesticas", "relogios_presentes", "brinquedos"
     ]
     categoria_selecionada = st.selectbox("Filtrar por Categoria:", lista_categorias)
+    st.caption("💡 Em pedidos com mais de um produto, usamos a categoria do primeiro item. O comentário pode se referir a outro produto do mesmo pedido.")
 
 if st.button("Analisar Sentimento e Avaliações"):
     if pergunta_usuario:
         with st.spinner(f"Analisando base..."):
             try:
-                # Passamos o filtro escolhido na tela para o banco vetorial
+                # 1. Inicializa os componentes
                 retriever = carregar_banco_vetorial(categoria_selecionada)
-                rag_chain = montar_pipeline(retriever)
                 
-                resposta = rag_chain.invoke(pergunta_usuario)
+                # 2. OTIMIZAÇÃO: Faz a busca no banco APENAS UMA VEZ e guarda o resultado
+                docs_recuperados = retriever.invoke(pergunta_usuario)
+                
+                # 3. Formata os documentos guardados e gera a resposta
+                contexto_formatado = formatar_docs_com_metadados(docs_recuperados)
+                
+                # 4. Modificamos o pipeline para aceitar o contexto formatado diretamente
+                llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0.1)
+                template_voc = """
+                Você é um analista de Voice of Customer (VoC) de um e-commerce.
+                Seu objetivo é responder à pergunta do gestor utilizando estritamente o contexto de avaliações fornecido.
+
+                Regras de negócio:
+                1. Responda baseando-se APENAS no contexto abaixo.
+                2. Se o contexto não contiver informações suficientes, responda EXATAMENTE: "Não possuo evidências suficientes na base de avaliações para responder a esta pergunta."
+                3. Sempre cite as evidências: mencione trechos dos comentários e faça referência à Categoria e à Nota.
+                4. Estruture a resposta em tópicos.
+
+                Contexto (Avaliações recuperadas):
+                {context}
+
+                Pergunta do gestor: {question}
+
+                Resposta analítica:
+                """
+                
+                prompt = PromptTemplate.from_template(template_voc)
+                chain = prompt | llm | StrOutputParser()
+                resposta = chain.invoke({"context": contexto_formatado, "question": pergunta_usuario})
                 
                 st.markdown("### 📋 Análise Gerencial")
                 st.write(resposta)
                 
-                with st.expander("🔍 Ver Evidências Recuperadas (Contexto Bruto)"):
-                    docs_recuperados = retriever.invoke(pergunta_usuario)
+                # 5. UX: Título ajustado conforme sugestão do professor, usando a MESMA variável da busca
+                with st.expander("🔍 Comentários enviados ao modelo"):
                     for i, doc in enumerate(docs_recuperados, 1):
                         st.markdown(f"**Evidência {i}** (Nota: {doc.metadata.get('review_score')} | Categoria: {doc.metadata.get('product_category_name')})")
                         st.write(f"_{doc.page_content}_")
