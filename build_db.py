@@ -6,7 +6,7 @@ from langchain_community.vectorstores import Chroma
 print("Iniciando a construção do Banco Vetorial na nuvem...")
 
 # 1. Carrega a base limpa (que é super leve)
-df = pd.read_csv('base_conhecimento_limpa.csv')
+df = pd.read_csv('dados/base_conhecimento_limpa.csv')
 
 # 2. Transforma em documentos
 documentos = []
