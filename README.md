@@ -21,11 +21,11 @@ O fluxo do sistema foi desenhado da seguinte forma:
 
 ## ⚙️ Preparação da Base de Dados
 
-A preparação dos dados (documentada no arquivo `01_preparacao_dados.ipynb` e `01_preparacao_dados_storytelling.ipynb`) incluiu as seguintes estratégias:
+A preparação dos dados (documentada no notebook localizado em `notebooks/01_preparacao_dados_storytelling.ipynb`) incluiu as seguintes estratégias:
 
-* **Seleção:** Filtramos apenas as avaliações que continham texto explícito em `review_comment_message` (avaliações apenas com nota foram descartadas por não agregarem contexto semântico).
-* **Limpeza:** Remoção de quebras de linha (`\n`, `\r`) e múltiplos espaços para não prejudicar a vetorização. Textos muito curtos (menos de 15 caracteres) também foram removidos.
-* **Enriquecimento (Desafio Adicional):** Realizamos cruzamentos (Joins) entre as tabelas `Reviews`, `Orders`, `Items` e `Products`. Isso nos permitiu atrelar a cada comentário de avaliação a **Categoria do Produto** e a **Nota**, essenciais para análises contextualizadas.
+- **Seleção:** Filtramos apenas as avaliações que continham texto explícito em `review_comment_message` (avaliações apenas com nota foram descartadas por não agregarem contexto semântico).
+- **Limpeza:** Remoção de quebras de linha (`\n`, `\r`) e múltiplos espaços para não prejudicar a vetorização. Textos muito curtos (menos de 15 caracteres) também foram removidos.
+- **Enriquecimento (Desafio Adicional):** Realizamos cruzamentos (Joins) entre as tabelas `Reviews`, `Orders`, `Items` e `Products`. Isso nos permitiu atrelar a cada comentário de avaliação a **Categoria do Produto** e a **Nota**, essenciais para análises contextualizadas.
 
 ## 🧠 Estratégia do Pipeline RAG
 
@@ -37,71 +37,41 @@ A orquestração do RAG foi construída utilizando **LangChain**:
 
 ## ⚖️ Justificativa das Decisões Técnicas
 
-* **Modelo de Embeddings (`paraphrase-multilingual-MiniLM-L12-v2`):** Escolhido por ser leve, rodar localmente sem custos (via CPU) e possuir um excelente desempenho em capturar nuances semânticas da língua portuguesa.
-* **Banco Vetorial (ChromaDB):** Ideal para projetos RAG locais, pois permite salvar os índices diretamente em uma pasta (`chroma_db_olist`), dispensando a configuração de servidores complexos para testes.
-* **LLM (Google Gemini 3.5 Flash):** Selecionado devido à sua extrema velocidade e baixo custo. Os modelos da família *Flash* são otimizados para tarefas de RAG e formatação estrita de texto, seguindo as regras do prompt perfeitamente.
-* **Interface (Streamlit):** Permite a rápida criação de aplicações web interativas em Python puro, entregando um painel executivo visualmente agradável para os gestores.
-* **Desafio Adicional (Filtro de Metadados):** Em vez de colocar a categoria na pergunta (o que confunde o motor de busca), adicionamos um filtro direto no retriever do ChromaDB na interface. Isso impede a poluição de contexto e força a busca apenas nas avaliações pertinentes à categoria escolhida.
+- **Modelo de Embeddings (`paraphrase-multilingual-MiniLM-L12-v2`):** Escolhido por ser leve, rodar localmente sem custos (via CPU) e possuir um excelente desempenho em capturar nuances semânticas da língua portuguesa.
+- **Banco Vetorial (ChromaDB):** Ideal para projetos RAG, permite a criação do banco vetorial de forma otimizada a partir da base CSV tratada.
+- **LLM (Google Gemini 3.5 Flash):** Selecionado devido à sua extrema velocidade e baixo custo. Os modelos da família *Flash* são otimizados para tarefas de RAG e formatação estrita de texto, seguindo as regras do prompt perfeitamente.
+- **Interface (Streamlit):** Permite a rápida criação de aplicações web interativas em Python puro, entregando um painel executivo visualmente agradável para os gestores.
+- **Desafio Adicional (Filtro de Metadados):** Em vez de colocar a categoria na pergunta (o que confunde o motor de busca), adicionamos um filtro direto no retriever do ChromaDB na interface. Isso impede a poluição de contexto e força a busca apenas nas avaliações pertinentes à categoria escolhida.
 
 ## 🛠️ Tecnologias e Bibliotecas Utilizadas
 
-* **Python 3.10+**
-* **Pandas** (Tratamento e Joins de Dados)
-* **LangChain** (Orquestração do Pipeline RAG)
-* **Sentence-Transformers** (Geração de Embeddings HuggingFace)
-* **ChromaDB** (Banco de Dados Vetorial Local)
-* **Google Generative AI / Gemini** (LLM Gerativo)
-* **Streamlit** (Front-end e Deploy Local)
+- **Python 3.10+**
+- **Pandas** (Tratamento e Joins de Dados)
+- **LangChain** (Orquestração do Pipeline RAG)
+- **Sentence-Transformers** (Geração de Embeddings HuggingFace)
+- **ChromaDB** (Banco de Dados Vetorial Local)
+- **Google Generative AI / Gemini** (LLM Gerativo)
+- **Streamlit** (Front-end e Deploy Local)
 
 ## 💡 Exemplos de Perguntas e Respostas (Casos de Uso)
 
 Aqui estão alguns exemplos práticos de como a solução reage a diferentes intenções de busca:
 
 **1. Investigação de problemas gerais (Extração de Insatisfação)**
-* **Pergunta:** "Quais problemas os clientes relatam sobre a entrega?"
-* **Resposta do Sistema:** O sistema lista tópicos como "Entregas parciais/incompletas e divergência de status", fundamentando com evidências cruzadas: *[Nota: 1 | Categoria: cool_stuff] Comentário: "consta como produto entregue, porém foi entregue apenas 1 produto..."*
+- **Pergunta:** "Quais problemas os clientes relatam sobre a entrega?"
+- **Resposta do Sistema:** O sistema lista tópicos como "Entregas parciais/incompletas e divergência de status", fundamentando com evidências cruzadas: *[Nota: 1 | Categoria: cool_stuff] Comentário: "consta como produto entregue, porém foi entregue apenas 1 produto..."*
 
 **2. Exploração contextual com Metadados (Desafio Adicional)**
-* **Pergunta:** "Quais são os principais problemas relatados?" (Filtro aplicado: `beleza_saude`)
-* **Resposta do Sistema:** O modelo isola a base e retorna insights nichados: "Envio de produto divergente e mau atendimento". Evidência: *[Nota: 1 | Categoria: beleza_saude] Comentário: "Produto diferente do pedido..."*
+- **Pergunta:** "Quais são os principais problemas relatados?" (Filtro aplicado: `beleza_saude`)
+- **Resposta do Sistema:** O modelo isola a base e retorna insights nichados: "Envio de produto divergente e mau atendimento". Evidência: *[Nota: 1 | Categoria: beleza_saude] Comentário: "Produto diferente do pedido..."*
 
 **3. Tratamento de Perguntas sem Evidências Suficientes (Filtro Anti-Alucinação)**
-* **Pergunta:** "Qual a receita para fazer um bolo de chocolate?"
-* **Resposta do Sistema:** *"Não possuo evidências suficientes na base de avaliações para responder a esta pergunta."* (O modelo reconhece a limitação do escopo e bloqueia a geração de conteúdo irreal).
+- **Pergunta:** "Qual a receita para fazer um bolo de chocolate?"
+- **Resposta do Sistema:** *"Não possuo evidências suficientes na base de avaliações para responder a esta pergunta."* (O modelo reconhece a limitação do escopo e bloqueia a geração de conteúdo irreal).
 
-## 🚀 Instruções de Instalação e Execução
+## 🚀 Instalação e Execução Local
 
-### Pré-requisitos
-
-* Python instalado na máquina.
-* Chave de API do Google AI Studio (Gemini).
-
-### Passo a Passo
-
-1. **Clone o repositório:**
-   ```bash
-   git clone https://github.com/SEU_USUARIO/NOME_DO_REPOSITORIO.git
-   cd NOME_DO_REPOSITORIO
-   ```
-
-2. **Instale as dependências:**
-   Crie um ambiente virtual (opcional, mas recomendado) e instale o arquivo requirements:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Configure as Variáveis de Ambiente:**
-   Crie um arquivo chamado `.env` na raiz do projeto e insira a sua chave da API do Google:
-   ```env
-   GOOGLE_API_KEY=sua_chave_de_api_aqui
-   ```
-
-4. **Prepare os Dados (Opcional):**
-   *(Se a pasta `chroma_db_olist` já estiver no repositório, você pode pular esta etapa)*.
-   Caso queira recriar o banco vetorial e limpar a base do zero, execute todas as células do arquivo `01_preparacao_dados_storytelling.ipynb`.
-
-5. **Execute a Aplicação Streamlit:**
-   ```bash
-   streamlit run app.py
-   ```
-   A aplicação abrirá automaticamente no seu navegador padrão (geralmente em `http://localhost:8501`).
+**1. Clone este repositório para a sua máquina e acesse a pasta:**
+```bash
+git clone [https://github.com/AlbertGus/tech-challenge-4-voc.git](https://github.com/AlbertGus/tech-challenge-4-voc.git)
+cd tech-challenge-4-voc
